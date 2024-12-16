@@ -1,0 +1,5 @@
+/build
+
+# possible symlinks
+/vmlinux.h
+/*.skel.h
