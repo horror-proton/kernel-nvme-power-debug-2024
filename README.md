@@ -1,10 +1,9 @@
-For some reason a nvme SSD on my laptop would sometimes split logs like:
+For some reason a nvme SSD on my laptop would sometimes stall with a message like:
 ```
 nvme nvme0: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
 nvme nvme0: Does your device have a fauty power saving mode enabled?
 ...
 ```
-and dies.
 
 I have put something like `nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off`
 in the kernel command line, but it doesn't help.
@@ -17,6 +16,14 @@ Perhaps disabling D3cold would help:
 w /sys/class/nvme/nvme*/device/d3cold_allowed - - - - 0
 ```
 
+This repo stores some temporary shit code for debugging
+
+---
+## bpf
+A BPF program for pci power state monitoring.
+
+## tmpfiles.d
+Tmpfiles config for systemd-tmpfiles.
 
 ```
 

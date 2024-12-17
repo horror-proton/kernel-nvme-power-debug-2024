@@ -22,9 +22,14 @@ static int handle_buf(void *ctx, void *data, size_t size) {
   return 0;
 }
 
+static const char *const pci_power_names[] = {
+    "error", "D0", "D1", "D2", "D3hot", "D3cold", "unknown",
+};
+
 static int handle_event(void *ctx, void *data, size_t size) {
   const struct set_event_t *event = data;
-  printf("state=%d\n", event->state);
+  printf("acpi_pci_set_power_state('%s', PCI_%s)\n", event->name,
+         pci_power_names[1 + event->state]);
   return 0;
 }
 
@@ -44,9 +49,13 @@ int main() {
     goto cleanup;
   }
 
-  struct ring_buffer *rb = ring_buffer__new(bpf_map__fd(skel->maps.events),
-                                            handle_event, NULL, NULL);
-  // ring_buffer__new(bpf_map__fd(skel->maps.stacks), handle_buf, NULL, NULL);
+  struct ring_buffer *rb =
+#if 0
+      ring_buffer__new(bpf_map__fd(skel->maps.stacks), handle_buf, NULL, NULL);
+#else
+      ring_buffer__new(bpf_map__fd(skel->maps.events), handle_event, NULL,
+                       NULL);
+#endif
 
   if (!rb) {
     err = -1;

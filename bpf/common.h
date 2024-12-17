@@ -9,4 +9,5 @@ struct stack_trace_t {
 
 struct set_event_t {
   int state;
+  char name[255];
 };
