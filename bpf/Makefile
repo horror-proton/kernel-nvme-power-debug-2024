@@ -1,7 +1,7 @@
 OUTPUT := ./build
 CC := clang
 CFLAGS := -O2 -g -Wall
-LDFLAGS := -lbpf
+LDFLAGS := -lbpf -lblazesym_c
 
 $(OUTPUT)/vmlinux.h:
 	mkdir -p $(OUTPUT)

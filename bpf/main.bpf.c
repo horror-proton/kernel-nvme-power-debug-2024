@@ -56,14 +56,17 @@ int BPF_KPROBE(acpi_pci_set_power_state, struct pci_dev *dev,
   {
     const char *init_name = BPF_CORE_READ(dev, dev.init_name);
     if (init_name)
-      bpf_probe_read_str(&event->name, sizeof(event->name), init_name);
+      bpf_probe_read_str(&event->dev_name, sizeof(event->dev_name), init_name);
     else {
       const char *kobj_name = BPF_CORE_READ(dev, dev.kobj.name);
-      bpf_probe_read_kernel_str(&event->name, sizeof(event->name), kobj_name);
+      bpf_probe_read_kernel_str(&event->dev_name, sizeof(event->dev_name),
+                                kobj_name);
       // not working, why?
       // BPF_CORE_READ_STR_INTO(&event->name, dev, dev.kobj.name);
     }
   }
+
+  event->st.size = bpf_get_stack(ctx, &event->st.ip, sizeof(event->st.ip), 0);
   bpf_ringbuf_submit(event, 0);
 
   return 0;
