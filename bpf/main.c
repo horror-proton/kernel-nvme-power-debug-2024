@@ -80,11 +80,12 @@ static int handle_event(void *ctx, void *data, size_t size) {
 
   const char *expected_name = (const char *)ctx;
 
-  if (expected_name && strcmp(event->dev_name, expected_name) != 0)
+  if (expected_name && strcmp(event->dev_name, expected_name) != 0 &&
+      strcmp(event->drv_name, expected_name) != 0)
     return 0;
 
-  printf("acpi_pci_set_power_state( '%s', PCI_%s )\n", event->dev_name,
-         pci_power_names[1 + event->state]);
+  printf("acpi_pci_set_power_state({%s %s}, PCI_%s )\n", event->drv_name,
+         event->dev_name, pci_power_names[1 + event->state]);
   print_stack(&event->st);
   return 0;
 }
@@ -97,6 +98,7 @@ int main(int argc, char **argv) {
   g_symbolizer = blaze_symbolizer_new();
   (void)setvbuf(stdout, NULL, _IONBF, 0);
   int err = 0;
+  struct main_bpf *skel = NULL;
 
   if (signal(SIGINT, sig_handler) == SIG_ERR ||
       signal(SIGTERM, sig_handler) == SIG_ERR) {
@@ -104,7 +106,7 @@ int main(int argc, char **argv) {
     goto cleanup;
   }
 
-  struct main_bpf *skel = main_bpf__open_and_load();
+  skel = main_bpf__open_and_load();
   if (!skel) {
     (void)fprintf(stderr, "Failed to open and load BPF skeleton\n");
     return 1;

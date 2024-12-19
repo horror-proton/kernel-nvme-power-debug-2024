@@ -66,6 +66,22 @@ int BPF_KPROBE(acpi_pci_set_power_state, struct pci_dev *dev,
     }
   }
 
+  // dev_driver_string
+  {
+    const char *name = "";
+    struct device_driver *drv = BPF_CORE_READ(dev, dev.driver);
+    const struct bus_type *bus = BPF_CORE_READ(dev, dev.bus);
+    const struct class *cls = BPF_CORE_READ(dev, dev.class);
+    if (drv) {
+      name = BPF_CORE_READ(drv, name);
+    } else if (bus) {
+      name = BPF_CORE_READ(bus, name);
+    } else if (cls) {
+      name = BPF_CORE_READ(cls, name);
+    }
+    bpf_probe_read_str(&event->drv_name, sizeof(event->drv_name), name);
+  }
+
   event->st.size = bpf_get_stack(ctx, &event->st.ip, sizeof(event->st.ip), 0);
   bpf_ringbuf_submit(event, 0);
 

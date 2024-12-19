@@ -14,6 +14,7 @@ struct stack_trace_t {
 
 struct set_event_t {
   int state;
-  char dev_name[255];
+  char dev_name[64];
+  char drv_name[64];
   struct stack_trace_t st;
 };
