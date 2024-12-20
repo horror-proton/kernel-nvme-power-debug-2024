@@ -1,0 +1,8 @@
+[Unit]
+Description=NVMe debug
+
+[Service]
+ExecStart=/usr/local/bin/kernel-nvme-debug nvme
+
+[Install]
+WantedBy=multi-user.target
